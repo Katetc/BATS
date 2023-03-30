@@ -4,16 +4,16 @@ Build and test structure
 
 The build and test structure (BATS) is primarily intended to allow users and developers to
 quickly generate a set of regression tests for use with the Land Ice Validation
-and Verification (LIVV) toolkit. 
+and Verification (LIVV) toolkit.
 
 BATS is a [Python 2.7](https://www.python.org/) module that is primarily
-controlled by command line options. 
+controlled by command line options.
 BATS requires:
 
-Python Packages 
-* [python-numpy](https://pypi.python.org/pypi/numpy) 
-* [python-scipy](https://pypi.python.org/pypi/scipy) 
-* [python-netCDF4](https://pypi.python.org/pypi/netCDF4) 
+Python Packages
+* [python-numpy](https://pypi.python.org/pypi/numpy)
+* [python-scipy](https://pypi.python.org/pypi/scipy)
+* [python-netCDF4](https://pypi.python.org/pypi/netCDF4)
 * [python-matplotlib](https://pypi.python.org/pypi/matplotlib)
 
 External Packages
@@ -22,7 +22,7 @@ External Packages
 * [HDF5 1.8.6](https://www.hdfgroup.org/HDF5/)
 
 If you have a working install of CISM, and you installed the suggested packages
-in the [CISM](http://oceans11.lanl.gov/cism/documentation.html) users manual,
+in the [CISM](https://github.com/CISM/cism-documentation) users manual,
 you'll likely already have everything you need. If you haven't previously built
 CISM on your machine, we suggest following the installation instructions as they
 are laid out in the users manual first.
@@ -31,7 +31,7 @@ are laid out in the users manual first.
 `setup_PLATFORM.bash` script has been provided which will attempt to load the
 needed modules.)
 
-If you are having any troubles with dependencies, open an issue on the 
+If you are having any troubles with dependencies, open an issue on the
 [LIVVkit issue tracker](https://github.com/LIVVkit/LIVVkit/issues)!
 
 ===========
@@ -54,16 +54,16 @@ list of options, run:
 ./build_and_test.py -h
 ```
 
-or 
+or
 
 ```sh
 python build_and_test.py -h
 ```
 
-Each LIVVkit workflow, listed on the 
+Each LIVVkit workflow, listed on the
 [LIVVkit usage](https://github.com/LIVVkit/LIVVkit/wiki/Usage) page, shows how
 BATS is used to generate data for LIVVkit, and the commands used. We suggest
-looking at the workflows first to get a general idea of how BATS will be used.  
+looking at the workflows first to get a general idea of how BATS will be used.
 
 ====================
    How BATS works
@@ -73,7 +73,7 @@ BATS works very similar to how you would build CISM and then run one or more CIS
 tests. BATS will build a version of CISM, and then either run a set of
 regression tests if you are using a personal computer (PC), or setup a series of
 regression tests and generate a job submission script if you are using a high
-performance computer (HPC). 
+performance computer (HPC).
 
 That is, if CISM is located in `$CISM`  on ORNL's HPC
 platform titan, for example, and you want to run the `$CISM/higher-order/dome`
@@ -117,45 +117,38 @@ will then run a set of CISM's higher-order tests:
 * Stream
 
 All of the files associated with each test will be output to a directory called
-`reg_test/titan-gnu/` which has a directory structure that mirrors CISM's test
-directory structure: 
+`reg_test/titan-gnu/CISM_glissade/` which has a leaf-node directory structure that
+provides some metadata for each test:
 
 ```sh
  reg_test/
     └── PLATFORM-COMPILER/
-        ├── CMakeCache.txt
-        ├── higher-order/
-        │    ├── dome/
-        │    │   ├── dome.RESO.pPRC.*
-        │    │   └── timing/
-        │    │       └── dome-t?.RESO.pPRC.*
-        │    ├── ismip-hom
-        │    │   ├── ismip-hom-a.RESO.pPRC.*
-        │    │   ├── ismip-hom-c.RESO.pPRC.*
-        │    │   └── ismip-hom-f.0100.pPRC.*
-        │    ├── shelf
-        │    │   ├── shelf-circular.RESO.pPRC.*
-        │    │   └── shelf-confined.RESO.pPRC.*
-        │    └── stream
-        │        └── stream.RESO.pPRC.*
-    --------------------------------------------
-        ├── Jobs/
-        │    ├── platform_job.small
-        │    ├── platform_job.small_timing_?
-        │    ├── platform_job.large
-        │    └── platform_job.large_timing_?
-        ├── submit_all_jobs.bash
-        └── clean_timing.bash
+        └── CISM_glissade/
+            ├── CMakeCache.txt
+            |-- TEST/
+                |-- CASE/
+                    |-- DOF/ (degrees of freedom)
+                        |-- PROCESSORS/
+                            |-- [OPTIONAL TEST SPECIFIC DIRS]
+                                |-- files.ext
+        --------------------------------------------
+            ├── all_jobs/
+            │    ├── platform_job.small
+            │    ├── platform_job.small_timing_?
+            │    ├── platform_job.large
+            │    └── platform_job.large_timing_?
+            ├── submit_all_jobs.bash
+            └── clean_timing.bash
 ```
 
-where `RESO` is a four-digit number indicating the model resolution (units are
-test specific), and `pPRC` is an optional three-digit number, prefixed by a
-`p`, indicating the number of processors used to run the model. Everything
-below the dashed line will only appear on HPC systems. `submit_all_jobs.bash`
-will submit all the jobs in the `jobs/` directory and `clean_timing.bash` will
-clean out any `higher-order/*/timing/` directory such that only the timing
-files remain (to be used once all jobs have finished). This
-`reg_test/titan-gnu/` directory is formatted to be used with LIVVkit directly. 
+where `DOF` is an s-prefixed integer indicating the test's size (units are test
+specific), and `PROCESSORS` is p-prefixed integer indicating the number of
+processors used to run the test. Everything below the dashed line will only
+appear on HPC systems. `submit_all_jobs.bash` will submit all the jobs in the
+`jobs/` directory and `clean_timing.bash` will clean out any repeated test run
+for performance profiling such that only the timing files remain (to be used
+once all jobs have finished). This `reg_test/titan-gnu/CISM_glissade`
+directory is formatted to be used with LIVVkit 2.1+ directly.
 
 BATS is designed to be flexible and work with any LIVVkit usage scenario. In
 order to do that, BATS provides a number of options to configure which system
@@ -172,5 +165,5 @@ directory, and which tests are run. For more information on these topics, see:
    Authors
 =============
 
-Joseph H. Kennedy, ORNL 
+Joseph H. Kennedy, ORNL
     github : jhkennedy
