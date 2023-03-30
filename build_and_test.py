@@ -3,7 +3,7 @@
 """
 The build and test structure (BATS) module. BATS is primarily intended to allow
 users and developers of CISM to quickly generate a set of regression tests for
-use with the Land Ice Validation and Verification toolkit (LIVVkit). 
+use with the Land Ice Validation and Verification toolkit (LIVVkit).
 """
 
 import os
@@ -32,10 +32,10 @@ def unsigned_int(x):
         raise argparse.ArgumentTypeError("This argument is an unsigned int type! Should be an integer greater than zero.")
     return x
 
-parser.add_argument('-p','--platform', default='linux-gnu',  
+parser.add_argument('-p','--platform', default='linux-gnu',
         help="A dash seperated string of your platform, compiler, and library specification."
             +" BATS will look for a CISM build directory specified by this string (or the longest subset of the string),"
-            +" and a `*-cmake.bash` build script with this string as a prefix.")
+            +" and a `*-cmake.sh` build script with this string as a prefix.")
 
 parser.add_argument('-i','--cism-dir', default=os.path.join(os.pardir, os.pardir),
         help="Location of the CISM source code.")
@@ -43,7 +43,7 @@ parser.add_argument('-b','--build-dir',default=os.path.join(os.getcwd(), 'build'
         help="Location to build CISM.")
 parser.add_argument('-j', type=unsigned_int, default='8',
         help="Number of processors to use when making CISM.")
-parser.add_argument('-s','--skip-build', action='store_true', 
+parser.add_argument('-s','--skip-build', action='store_true',
         help="Skip build and look for the CISM driver in BUILD_DIR.")
 
 parser.add_argument('-o','--out-dir', default='reg_test',
@@ -53,7 +53,7 @@ parser.add_argument('-f','--force', action='store_true',
 parser.add_argument('--timing', action='store_true',
         help="Run the timing test. This is needed for creating a new benchmark dataset. Selecting this option will force the --performance option to true as well.")
 
-#NOTE: These last two are just for personal desktop/laptop type machines. 
+#NOTE: These last two are just for personal desktop/laptop type machines.
 #      --performance is always turned on for HPC systems, and tests are
 #      only run on personal machines.
 parser.add_argument('--performance', action='store_true',
@@ -75,11 +75,11 @@ args = parser.parse_args([])
 def parse(arg_list):
     global args
     args = parser.parse_args(arg_list)
-    
+
 def main():
     global args
     # used to modify timing file names
-    args.tmod = None 
+    args.tmod = None
 
     # setup the needed paths
     args = paths.make_absolute(args)
@@ -101,13 +101,13 @@ def main():
         args = paths.cmake(args)
         print("\nPreparing to build CISM")
         print(  "=======================")
-          
+
         print("Build options:")
         print("   Platform: "+args.platform)
         print("-----------------------")
         print("cmake directory: "+args.cmake_dir)
         print("cmake file: "+args.cmake_file)
-        
+
         print("\nBuilding CISM")
         print(  "=============\n")
 
@@ -128,17 +128,17 @@ def main():
         process = subprocess.check_call(str.join("; ",prep_commands),executable='/bin/bash',shell=True)
 
         print("\nCISM built!")
-    
+
     print("\nSetting up regression tests directory")
     print(  "=====================================\n")
     data_dir = paths.mkdir_test(args, test_dict)
-   
+
     print(  "   Copying CMake cache into regression test directory.")
-    
+
     cache_name = "CMakeCache.txt"
     cache_file = os.path.join(args.build_dir, cache_name)
     cache_new = os.path.join(data_dir, cache_name)
-   
+
     subprocess.check_call("cp "+cache_file+" "+cache_new, shell=True)
 
     # check for GPTL if timing or performance is on
@@ -149,9 +149,9 @@ def main():
                 if 'CISM_USE_GPTL_INSTRUMENTATION' in line:
                     args.GPTLflag = line.strip().split('=')[-1]
                     break
-        
+
         if args.GPTLflag == "OFF":
-            print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n") 
+            print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
             print(  "WARNING: CISM was not build with GPTL\n")
             print(  "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
             print(  "Performance runs cannot be analyzed without GPTL. ")
@@ -159,7 +159,7 @@ def main():
             print("\nExiting...")
             sys.exit(1)
         elif args.GPTLflag != "ON":
-            print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n") 
+            print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
             print(  "WARNING: Could not determine if CISM")
             print(  "was build with GPTL or not.\n")
             print(  "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
@@ -167,27 +167,27 @@ def main():
             print(  "Either rebuild CISM with GPTL or rerun BATS without the performance or timing option.")
             print("\nExiting...")
             sys.exit(1)
-                    
+
     if isHPC:
         print("\nPreparing HPC batch jobs")
         print(  "========================\n")
-        
+
         runnit.hpc(args, cism_driver, data_dir, test_dict)
-        
+
         print("\nDone! You can now submit the job scripts.")
         print(  "=========================================")
-    
+
     else:
         print("\nRunning regression tests")
         print(  "========================\n")
-        
+
         runnit.personal(args, cism_driver, data_dir, test_dict)
 
         if args.timing:
             print("\nRe-running regression tests for timing data.")
             print(  "This is going to take a while. A long while.")
             print(  "============================================\n")
-            
+
             for rnd in range(10):
                 print("\nTiming round: "+str(rnd+1)+" of 10")
                 args.tmod = 't'+str(rnd)
@@ -199,7 +199,7 @@ def main():
             subprocess.check_call('cd '+data_dir+
                     ' ; find ./ -iname "*-t[0-9]*" -not -iname "*.results" -not -iname "*.cism_timing*" -type f -exec rm -f {} \\; \n',
                     shell=True)
-    
+
         print("\nAll regression tests finished.")
         print(  "==============================")
 
