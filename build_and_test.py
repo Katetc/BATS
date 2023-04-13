@@ -8,7 +8,6 @@ use with the Land Ice Validation and Verification toolkit (LIVVkit).
 
 import os
 import sys
-import time
 import argparse
 import subprocess
 
@@ -32,7 +31,8 @@ def unsigned_int(x):
     x = int(x)
     if x < 1:
         raise argparse.ArgumentTypeError(
-            "This argument is an unsigned int type! Should be an integer greater than zero."
+            "This argument is an unsigned int type! "
+            "Should be an integer greater than zero."
         )
     return x
 
@@ -144,7 +144,7 @@ def main():
         isHPC = False
 
     # always run performance tests if timing runs selected.
-    if args.timing == True:
+    if args.timing:
         args.performance = True
 
     if not args.skip_build:
@@ -262,7 +262,8 @@ def main():
             subprocess.check_call(
                 "cd "
                 + data_dir
-                + ' ; find ./ -iname "*-t[0-9]*" -not -iname "*.results" -not -iname "*.cism_timing*" -type f -exec rm -f {} \\; \n',
+                + ' ; find ./ -iname "*-t[0-9]*" -not -iname "*.results" '
+                '-not -iname "*.cism_timing*" -type f -exec rm -f {} \\; \n',
                 shell=True,
             )
 

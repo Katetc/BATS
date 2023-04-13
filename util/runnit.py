@@ -5,7 +5,6 @@
 """
 
 import os
-import sys
 import time
 import subprocess
 
@@ -176,7 +175,7 @@ def hpc(args, cism_driver, data_dir, test_dict):
         test_commands = [
             "cd " + cism_test_dir,
             "export PYTHONPATH=$PYTHONPATH:" + cism_test_dir,
-            "./"
+            "python3 "
             + run_script
             + " -q -e "
             + cism_driver
@@ -203,7 +202,7 @@ def hpc(args, cism_driver, data_dir, test_dict):
                 test_commands = [
                     "cd " + cism_test_dir,
                     "export PYTHONPATH=$PYTHONPATH:" + cism_test_dir,
-                    "./"
+                    "python3 "
                     + run_script
                     + " -q -e "
                     + cism_driver
@@ -239,7 +238,7 @@ def hpc(args, cism_driver, data_dir, test_dict):
                 timing_commands.extend(
                     [
                         "cd " + cism_test_dir,
-                        "./"
+                        "python3 "
                         + run_script
                         + " -q -e "
                         + cism_driver
@@ -260,7 +259,7 @@ def hpc(args, cism_driver, data_dir, test_dict):
                     timing_commands.extend(
                         [
                             "cd " + cism_test_dir,
-                            "./"
+                            "python3 "
                             + run_script
                             + " -q -e "
                             + cism_driver
@@ -289,7 +288,8 @@ def hpc(args, cism_driver, data_dir, test_dict):
                 small_run_commands.append(command)
 
     ## set all aprun commands to background
-    # small_run_commands = [command.replace('\n',' & \n') if 'aprun' in command else command for command in small_run_commands ]
+    # small_run_commands = [command.replace('\n',' & \n') if 'aprun' in
+    # command else command for command in small_run_commands ]
 
     # create the default and small perf job script.
     platform_dict["PBS_N"] = "small"
@@ -320,7 +320,7 @@ def hpc(args, cism_driver, data_dir, test_dict):
                 test_commands = [
                     "cd " + cism_test_dir,
                     "export PYTHONPATH=$PYTHONPATH:" + cism_test_dir,
-                    "./"
+                    "python3 "
                     + run_script
                     + " -q -e "
                     + cism_driver
@@ -356,7 +356,7 @@ def hpc(args, cism_driver, data_dir, test_dict):
                 large_timing_commands.extend(
                     [
                         "cd " + cism_test_dir,
-                        "./"
+                        "python3 "
                         + run_script
                         + " -q -e "
                         + cism_driver
@@ -377,7 +377,7 @@ def hpc(args, cism_driver, data_dir, test_dict):
                     large_timing_commands.extend(
                         [
                             "cd " + cism_test_dir,
-                            "./"
+                            "python3 "
                             + run_script
                             + " -q -e "
                             + cism_driver
@@ -410,7 +410,8 @@ def hpc(args, cism_driver, data_dir, test_dict):
                 large_run_commands.append(command)
 
     # set all aprun commands to background
-    # large_run_commands = [command.replace('\n',' & \n') if 'aprun' in command else command for command in large_run_commands ]
+    # large_run_commands = [command.replace('\n',' & \n') if 'aprun'
+    # in command else command for command in large_run_commands ]
 
     # create the default job script.
     platform_dict["PBS_N"] = "large"
@@ -456,7 +457,8 @@ def hpc(args, cism_driver, data_dir, test_dict):
                         small_timing_run_commands.append(command)
 
             # set all aprun commands to background
-            # small_timing_run_commands = [command.replace('\n',' & \n') if 'aprun' in command else command for command in small_timing_run_commands ]
+            # small_timing_run_commands = [command.replace('\n',' & \n') if 'aprun'
+            # in command else command for command in small_timing_run_commands ]
 
             # create the default job script.
             platform_dict["PBS_N"] = "small_timing_" + str(rnd)
@@ -503,7 +505,8 @@ def hpc(args, cism_driver, data_dir, test_dict):
                         large_timing_run_commands.append(command)
 
             # set all aprun commands to background
-            # large_timing_run_commands = [command.replace('\n',' & \n') if 'aprun' in command else command for command in large_timing_run_commands ]
+            # large_timing_run_commands = [command.replace('\n',' & \n') if 'aprun'
+            # in command else command for command in large_timing_run_commands ]
 
             # create the default job script.
             platform_dict["PBS_N"] = "large_timing_" + str(rnd)
@@ -543,7 +546,8 @@ def hpc(args, cism_driver, data_dir, test_dict):
             clean_file.write("#!/usr/bin/env bash \n \n")
             clean_file.write("cd " + data_dir + " \n")
             clean_file.write(
-                'find ./ -iname "*-t[0-9]*" -not -iname "*.cism_timing*" -type f -exec rm -f {} \\; \n'
+                'find ./ -iname "*-t[0-9]*" -not -iname "*.cism_timing*" '
+                '-type f -exec rm -f {} \\; \n'
             )
             clean_file.write(" \n")
 
@@ -570,5 +574,6 @@ def hpc(args, cism_driver, data_dir, test_dict):
         print("\n   Created script to clean out timing directory:")
         print("      " + clean_script)
         print(
-            "\n      Run this script after ALL jobs finish to remove every unneeded file in the timing directories."
+            "\n      Run this script after ALL jobs finish to remove every "
+            "unneeded file in the timing directories."
         )

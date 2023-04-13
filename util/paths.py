@@ -127,7 +127,8 @@ def mkdir_test(args, test_dict):
             print("\n" + case_run_dir + "\n")
             print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
             print(
-                "Some data may be overwritten. Either specify a different test directory, or "
+                "Some data may be overwritten. Either specify a different test "
+                "directory, or "
             )
             print("re-run with the -f or --force option to ignore existing data.")
             print("\nExiting...")
@@ -147,7 +148,8 @@ def mkdir_test(args, test_dict):
                     print("\n" + case_run_dir + "\n")
                     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
                     print(
-                        "Some data may be overwritten. Either specify a different test directory, or "
+                        "Some data may be overwritten. Either specify a different test "
+                        "directory, or "
                     )
                     print(
                         "re-run with the -f or --force option to ignore existing data."
@@ -181,7 +183,8 @@ def cmake(args):
         for i in tried:
             print("    " + i)
         print(
-            "\nSee the cmake builds directory for supported platform-compiler combinations."
+            "\nSee the cmake builds directory for "
+            "supported platform-compiler combinations."
         )
         sys.exit(1)
 
