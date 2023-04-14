@@ -158,6 +158,18 @@ def main():
         print("cmake directory: " + args.cmake_dir)
         print("cmake file: " + args.cmake_file)
 
+        print("\nBuilding GPTL")
+        print("=============\n")
+        # Make libgptl first
+        platform_key = args.platform.split("-")[0]
+        gptl_makefile = dicts.hpc_dict[platform_key].get("gptl_makefile", "Makefile")
+        gptl_make_cmd = [
+            f"cd {args.cism_dir}/utils/libgptl", f"make -f {gptl_makefile} clean all",
+        ]
+        process = subprocess.check_call(
+            "&& ".join(gptl_make_cmd), executable="/bin/bash", shell=True
+        )
+
         print("\nBuilding CISM")
         print("=============\n")
 
@@ -178,7 +190,6 @@ def main():
             "make -j " + str(args.j),
             "exit",
         ]
-
         # print(str.join("; ",prep_commands))
         process = subprocess.check_call(
             str.join("; ", prep_commands), executable="/bin/bash", shell=True

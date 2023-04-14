@@ -135,6 +135,7 @@ cheyenne_dict = {
     "RES_NUM": "2:ncpus=36:mpiprocs=36",
     "PBS_walltime": "01:00:00",
     "RUN_CMD": "mpiexec_mpt",
+    "gptl_makefile": "Makefile.sgi_intel",
 }
 
 
