@@ -38,7 +38,7 @@ def personal(args, cism_driver, data_dir, test_dict):
         # run default test
         test_commands = [
             "cd " + os.path.join(args.cism_dir, "tests", case_split[0]),
-            "./"
+            "python3 "
             + run_script
             + " -q -e "
             + cism_driver
@@ -66,7 +66,7 @@ def personal(args, cism_driver, data_dir, test_dict):
 
                 test_commands = [
                     "cd " + os.path.join(args.cism_dir, "tests", case_split[0]) + " ",
-                    "./"
+                    "python3 "
                     + run_script
                     + " -q -e "
                     + cism_driver
@@ -115,7 +115,7 @@ def create_job(args, job_name, p_replace, run_commands):
     with open(job_name, "w") as job_file:
         with open("util/job.template", "r") as base_job:
             for line in base_job:
-                for src, target in p_replace.iteritems():
+                for src, target in p_replace.items():
                     line = line.replace(src, target)
                 job_file.write(line)
 
@@ -283,7 +283,7 @@ def hpc(args, cism_driver, data_dir, test_dict):
     small_run_commands = []
     for rf in small_run_files:
         with open(rf, "r") as rfo:
-            rfo.next()  # skip shebang
+            next(rfo)  # skip shebang
             for command in rfo:
                 small_run_commands.append(command)
 
@@ -405,7 +405,7 @@ def hpc(args, cism_driver, data_dir, test_dict):
     large_run_commands = []
     for rf in large_run_files:
         with open(rf, "r") as rfo:
-            rfo.next()  # skip shebang
+            next(rfo)  # skip shebang
             for command in rfo:
                 large_run_commands.append(command)
 
@@ -454,7 +454,7 @@ def hpc(args, cism_driver, data_dir, test_dict):
             small_timing_run_commands = []
             for rf in subset_run_files:
                 with open(rf, "r") as rfo:
-                    rfo.next()  # skip shebang
+                    next(rfo)  # skip shebang
                     for command in rfo:
                         small_timing_run_commands.append(command)
 
@@ -504,7 +504,7 @@ def hpc(args, cism_driver, data_dir, test_dict):
             large_timing_run_commands = []
             for rf in subset_run_files:
                 with open(rf, "r") as rfo:
-                    rfo.next()  # skip shebang
+                    next(rfo)  # skip shebang
                     for command in rfo:
                         large_timing_run_commands.append(command)
 

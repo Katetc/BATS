@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 """
 The build and test structure (BATS) module. BATS is primarily intended to allow
@@ -137,7 +137,7 @@ def main():
     cism_driver = os.path.join(args.build_dir, "cism_driver", "cism_driver")
 
     # always run performance tests on HPC systems.
-    if args.platform.lower().split("-")[0] in dicts.hpc_dict.keys():
+    if args.platform.lower().split("-")[0] in list(dicts.hpc_dict.keys()):
         isHPC = True
         args.performance = True
     else:
