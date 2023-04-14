@@ -418,6 +418,8 @@ def hpc(args, cism_driver, data_dir, test_dict):
     platform_dict["PBS_walltime"] = "01:00:00"
     if platform_key.lower() == "hopper":
         platform_dict["RES_NUM"] = str(11 * 24)
+    elif "cheyenne" in platform_key.lower():
+        platform_dict["RES_NUM"] = "16:ncpus=36:mpiprocs=36"
     else:
         platform_dict["RES_NUM"] = "16"
 
@@ -465,6 +467,8 @@ def hpc(args, cism_driver, data_dir, test_dict):
             platform_dict["PBS_walltime"] = "1:00:00"
             if platform_key.lower() == "hopper":
                 platform_dict["RES_NUM"] = str(1 * 24)
+            elif "cheyenne" in platform_key.lower():
+                platform_dict["RES_NUM"] = "1:ncpus=36:mpiprocs=36"
             else:
                 platform_dict["RES_NUM"] = "1"
 
@@ -513,6 +517,9 @@ def hpc(args, cism_driver, data_dir, test_dict):
             if platform_key.lower() == "hopper":
                 platform_dict["PBS_walltime"] = "20:00"
                 platform_dict["RES_NUM"] = str(11 * 24)
+            elif "cheyenne" in platform_key.lower():
+                platform_dict["PBS_walltime"] = "00:20:00"
+                platform_dict["RES_NUM"] = "16:ncpus=36:mpiprocs=36"
             else:
                 platform_dict["PBS_walltime"] = "00:20:00"
                 platform_dict["RES_NUM"] = "16"
