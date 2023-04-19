@@ -7,6 +7,7 @@
 import os
 import time
 import subprocess
+from pathlib import Path
 
 from util import paths
 from util import dicts
@@ -37,22 +38,14 @@ def personal(args, cism_driver, data_dir, test_dict):
 
         # run default test
         test_commands = [
-            "cd " + os.path.join(args.cism_dir, "tests", case_split[0]),
-            "python3 "
-            + run_script
-            + " -q -e "
-            + cism_driver
-            + " -o "
-            + case_run_dir
-            + mod_arg
-            + " -n 1",
+            f"cd {Path('tests', case_split[0]).absolute()}",
+            f"python3 {run_script} -q -e {cism_driver} -o {case_run_dir} {mod_arg} -n 1",
             "exit",
         ]
 
-        # print(str.join(" ; ",test_commands))
         print("   Spawning " + case + " test default...")
         test_run[case] = subprocess.Popen(
-            str.join(" ; ", test_commands), executable="/bin/bash", shell=True
+            " ; ".join(test_commands), executable="/bin/bash", shell=True
         )
 
         # run performance test if specified
@@ -65,22 +58,13 @@ def personal(args, cism_driver, data_dir, test_dict):
                 case_run_dir = paths.case_run_directory(case_dir, run_args)
 
                 test_commands = [
-                    "cd " + os.path.join(args.cism_dir, "tests", case_split[0]) + " ",
-                    "python3 "
-                    + run_script
-                    + " -q -e "
-                    + cism_driver
-                    + " -o "
-                    + case_run_dir
-                    + mod_arg
-                    + " "
-                    + mod_dict[mod],
+                    f"cd {Path('tests', case_split[0]).absolute()} ",
+                    f"python3 {run_script} -q -e {cism_driver} -o {case_run_dir} {mod_arg} {mod_dict[mod]}",
                     "exit",
                 ]
 
-                # print(str.join(" ; ",test_commands))
                 test_run[case + " " + mod] = subprocess.Popen(
-                    str.join(" ; ", test_commands), executable="/bin/bash", shell=True
+                    " ; ".join(test_commands), executable="/bin/bash", shell=True
                 )
 
     print("\n   All tests spawned.\n")
@@ -163,7 +147,8 @@ def hpc(args, cism_driver, data_dir, test_dict):
         case_dir = os.path.join(
             data_dir, str.split(case_split[0], "/")[-1], case_split[-1]
         )
-        cism_test_dir = os.path.join(args.cism_dir, "tests", case_split[0])
+
+        cism_test_dir = Path("tests", case_split[0]).absolute()
         run_script, mod_dict = test_dict[case]
 
         run_args, ignore_args = paths.run_parser.parse_known_args(
@@ -173,52 +158,38 @@ def hpc(args, cism_driver, data_dir, test_dict):
 
         print("   Setting up " + case + " tests")
         test_commands = [
-            "cd " + cism_test_dir,
-            "export PYTHONPATH=$PYTHONPATH:" + cism_test_dir,
-            "python3 "
-            + run_script
-            + " -q -e "
-            + cism_driver
-            + " -o "
-            + case_run_dir
-            + mod_arg
-            + " -s -n 1 --hpc "
-            + run_cmd,
+            f"cd {cism_test_dir}",
+            f"export PYTHONPATH=$PYTHONPATH:{cism_test_dir}",
+            (
+                f"python3 {run_script} -q -e {cism_driver} "
+                f"-o {case_run_dir} {mod_arg} -s -n 1 --hpc {run_cmd}"
+            ),
             "exit",
         ]
 
         subprocess.check_call(
-            str.join(" ; ", test_commands), executable="/bin/bash", shell=True
+            " ; ".join(test_commands), executable="/bin/bash", shell=True
         )
 
         # run performance tests (always do this for hpc systems)
-        if mod_dict:
-            for mod in mod_dict:
-                run_args, ignore_args = paths.run_parser.parse_known_args(
-                    str.split(run_script, " ") + mod_dict[mod].split()
-                )
-                case_run_dir = paths.case_run_directory(case_dir, run_args)
+        for mod in mod_dict:
+            run_args, ignore_args = paths.run_parser.parse_known_args(
+                str.split(run_script, " ") + mod_dict[mod].split()
+            )
+            case_run_dir = paths.case_run_directory(case_dir, run_args)
+            test_commands = [
+                f"cd {Path('tests', case_split[0]).absolute()} ",
+                f"export PYTHONPATH=$PYTHONPATH:{cism_test_dir}",
+                (
+                    f"python3 {run_script} -q -e {cism_driver} -o "
+                    f"{case_run_dir} {mod_arg} {mod_dict[mod]}"
+                ),
+                "exit",
+            ]
 
-                test_commands = [
-                    "cd " + cism_test_dir,
-                    "export PYTHONPATH=$PYTHONPATH:" + cism_test_dir,
-                    "python3 "
-                    + run_script
-                    + " -q -e "
-                    + cism_driver
-                    + " -o "
-                    + case_run_dir
-                    + mod_arg
-                    + " "
-                    + mod_dict[mod]
-                    + " -s --hpc "
-                    + run_cmd,
-                    "exit",
-                ]
-
-                subprocess.check_call(
-                    str.join(" ; ", test_commands), executable="/bin/bash", shell=True
-                )
+            subprocess.check_call(
+                " ; ".join(test_commands), executable="/bin/bash", shell=True
+            )
 
         # get info to setup timing runs.
         if args.timing and mod_dict:
@@ -234,19 +205,14 @@ def hpc(args, cism_driver, data_dir, test_dict):
                 )
                 case_run_dir = paths.case_run_directory(case_dir, run_args)
 
-                timing_exports.add("export PYTHONPATH=$PYTHONPATH:" + cism_test_dir)
+                timing_exports.add(f"export PYTHONPATH=$PYTHONPATH:{cism_test_dir}")
                 timing_commands.extend(
                     [
-                        "cd " + cism_test_dir,
-                        "python3 "
-                        + run_script
-                        + " -q -e "
-                        + cism_driver
-                        + " -o "
-                        + case_run_dir
-                        + timing_mod
-                        + " -s -n 1 --hpc "
-                        + run_cmd,
+                        f"cd {cism_test_dir}",
+                        (
+                            f"python3 {run_script} -q -e {cism_driver} "
+                            f"-o {case_run_dir} {timing_mod} -s -n 1 --hpc {run_cmd}"
+                        ),
                     ]
                 )
 
@@ -258,18 +224,12 @@ def hpc(args, cism_driver, data_dir, test_dict):
 
                     timing_commands.extend(
                         [
-                            "cd " + cism_test_dir,
-                            "python3 "
-                            + run_script
-                            + " -q -e "
-                            + cism_driver
-                            + " -o "
-                            + case_run_dir
-                            + timing_mod
-                            + " "
-                            + mod_dict[mod]
-                            + " -s --hpc "
-                            + run_cmd,
+                            f"cd {cism_test_dir}",
+                            (
+                                f"python3 {run_script} -q -e {cism_driver} "
+                                f"-o {case_run_dir} {timing_mod} {mod_dict[mod]} -s "
+                                f"--hpc {run_cmd}"
+                            ),
                         ]
                     )
 
@@ -307,7 +267,8 @@ def hpc(args, cism_driver, data_dir, test_dict):
         case_dir = os.path.join(
             data_dir, str.split(case_split[0], "/")[-1], case_split[-1]
         )
-        cism_test_dir = os.path.join(args.cism_dir, "tests", case_split[0])
+        # cism_test_dir = os.path.join(args.cism_dir, "tests", case_split[0])
+        cism_test_dir = os.path.join("./", "tests", case_split[0])
         run_script, mod_dict = perf_large_dict[case]
 
         if mod_dict:
@@ -318,19 +279,12 @@ def hpc(args, cism_driver, data_dir, test_dict):
                 case_run_dir = paths.case_run_directory(case_dir, run_args)
 
                 test_commands = [
-                    "cd " + cism_test_dir,
-                    "export PYTHONPATH=$PYTHONPATH:" + cism_test_dir,
-                    "python3 "
-                    + run_script
-                    + " -q -e "
-                    + cism_driver
-                    + " -o "
-                    + case_run_dir
-                    + mod_arg
-                    + " "
-                    + mod_dict[mod]
-                    + " -s --hpc "
-                    + run_cmd,
+                    f"cd {cism_test_dir}",
+                    f"export PYTHONPATH=$PYTHONPATH:{cism_test_dir}",
+                    (
+                        f"python3 {run_script} -q -e {cism_driver} -o {case_run_dir} "
+                        f"{mod_arg} {mod_dict[mod]} -s --hpc {run_cmd}"
+                    ),
                     "exit",
                 ]
 
@@ -355,16 +309,11 @@ def hpc(args, cism_driver, data_dir, test_dict):
                 timing_exports.add("export PYTHONPATH=$PYTHONPATH:" + cism_test_dir)
                 large_timing_commands.extend(
                     [
-                        "cd " + cism_test_dir,
-                        "python3 "
-                        + run_script
-                        + " -q -e "
-                        + cism_driver
-                        + " -o "
-                        + case_run_dir
-                        + timing_mod
-                        + " -s -n 1 --hpc "
-                        + run_cmd,
+                        f"cd {cism_test_dir}",
+                        (
+                            f"python3 {run_script} -q -e {cism_driver} "
+                            f"-o {case_run_dir} {timing_mod} -s -n 1 --hpc {run_cmd}"
+                        ),
                     ]
                 )
 
@@ -376,18 +325,12 @@ def hpc(args, cism_driver, data_dir, test_dict):
 
                     large_timing_commands.extend(
                         [
-                            "cd " + cism_test_dir,
-                            "python3 "
-                            + run_script
-                            + " -q -e "
-                            + cism_driver
-                            + " -o "
-                            + case_run_dir
-                            + timing_mod
-                            + " "
-                            + mod_dict[mod]
-                            + " -s --hpc "
-                            + run_cmd,
+                            f"cd {cism_test_dir}",
+                            (
+                                f"python3 {run_script} -q -e {cism_driver} "
+                                f"-o {case_run_dir} {timing_mod} {mod_dict[mod]} "
+                                f"-s -n 1 --hpc {run_cmd}"
+                            ),
                         ]
                     )
 
@@ -554,7 +497,7 @@ def hpc(args, cism_driver, data_dir, test_dict):
             clean_file.write("cd " + data_dir + " \n")
             clean_file.write(
                 'find ./ -iname "*-t[0-9]*" -not -iname "*.cism_timing*" '
-                '-type f -exec rm -f {} \\; \n'
+                "-type f -exec rm -f {} \\; \n"
             )
             clean_file.write(" \n")
 

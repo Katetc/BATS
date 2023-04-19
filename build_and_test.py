@@ -10,6 +10,7 @@ import os
 import sys
 import argparse
 import subprocess
+from pathlib import Path
 
 from util import paths
 from util import dicts
@@ -158,14 +159,21 @@ def main():
         print("cmake directory: " + args.cmake_dir)
         print("cmake file: " + args.cmake_file)
 
-        print("\nBuilding GPTL")
-        print("=============\n")
-        # Make libgptl first
-        platform_key = args.platform.split("-")[0]
+        # Make libgptl first if we're doing perf testing
+        # Makefile is specified in dicts.py, for Cheynne-Intel it's Makefile.sgi_intel
+        if args.performance:
+            _gptl_dir = f"{args.cism_dir}/utils/libgptl"
+            platform_key = args.platform.split("-")[0]
+
+            print(f"\nBuilding GPTL in\n{_gptl_dir}")
+            print(f"{'=' * len(_gptl_dir)}\n")
+
         gptl_makefile = dicts.hpc_dict[platform_key].get("gptl_makefile", "Makefile")
         gptl_make_cmd = [
-            f"cd {args.cism_dir}/utils/libgptl", f"make -f {gptl_makefile} clean all",
+            f"cd {args.cism_dir}/utils/libgptl",
+            f"make -f {gptl_makefile} clean all",
         ]
+
         process = subprocess.check_call(
             "&& ".join(gptl_make_cmd), executable="/bin/bash", shell=True
         )
@@ -179,18 +187,14 @@ def main():
         # else:
         #    trilinos_string = "CISM_USE_TRILINOS=OFF"
 
+        cmake_path = Path("scripts/cmake", args.cmake_file).absolute()
         prep_commands = [
-            "cd " + args.build_dir,
-            # TODO: turn on args.library option.
-            # "export "+trilinos_string,
-            "source "
-            + os.path.join(args.cmake_dir, args.cmake_file)
-            + " "
-            + args.cism_dir,
-            "make -j " + str(args.j),
+            f"cd {args.build_dir}",
+            f"source {cmake_path} {args.cism_dir}",
+            f"make -j {args.j}",
             "exit",
         ]
-        # print(str.join("; ",prep_commands))
+
         process = subprocess.check_call(
             str.join("; ", prep_commands), executable="/bin/bash", shell=True
         )
