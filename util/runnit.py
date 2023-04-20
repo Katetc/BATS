@@ -182,7 +182,7 @@ def hpc(args, cism_driver, data_dir, test_dict):
                 f"export PYTHONPATH=$PYTHONPATH:{cism_test_dir}",
                 (
                     f"python3 {run_script} -q -e {cism_driver} -o "
-                    f"{case_run_dir} {mod_arg} {mod_dict[mod]}"
+                    f"{case_run_dir} {mod_arg} {mod_dict[mod]} -s --hpc {run_cmd}"
                 ),
                 "exit",
             ]
@@ -267,8 +267,7 @@ def hpc(args, cism_driver, data_dir, test_dict):
         case_dir = os.path.join(
             data_dir, str.split(case_split[0], "/")[-1], case_split[-1]
         )
-        # cism_test_dir = os.path.join(args.cism_dir, "tests", case_split[0])
-        cism_test_dir = os.path.join("./", "tests", case_split[0])
+        cism_test_dir = Path("tests", case_split[0]).absolute()
         run_script, mod_dict = perf_large_dict[case]
 
         if mod_dict:
@@ -306,7 +305,7 @@ def hpc(args, cism_driver, data_dir, test_dict):
                 )
                 case_run_dir = paths.case_run_directory(case_dir, run_args)
 
-                timing_exports.add("export PYTHONPATH=$PYTHONPATH:" + cism_test_dir)
+                timing_exports.add(f"export PYTHONPATH=$PYTHONPATH:{cism_test_dir}")
                 large_timing_commands.extend(
                     [
                         f"cd {cism_test_dir}",
@@ -333,7 +332,6 @@ def hpc(args, cism_driver, data_dir, test_dict):
                             ),
                         ]
                     )
-
     # -------------------------
     # Setup the large batch job
     # -------------------------
@@ -458,13 +456,13 @@ def hpc(args, cism_driver, data_dir, test_dict):
             # create the default job script.
             platform_dict["PBS_N"] = "large_timing_" + str(rnd)
             if platform_key.lower() == "hopper":
-                platform_dict["PBS_walltime"] = "20:00"
+                platform_dict["PBS_walltime"] = "40:00"
                 platform_dict["RES_NUM"] = str(11 * 24)
             elif "cheyenne" in platform_key.lower():
-                platform_dict["PBS_walltime"] = "00:20:00"
+                platform_dict["PBS_walltime"] = "00:40:00"
                 platform_dict["RES_NUM"] = "16:ncpus=36:mpiprocs=36"
             else:
-                platform_dict["PBS_walltime"] = "00:20:00"
+                platform_dict["PBS_walltime"] = "00:40:00"
                 platform_dict["RES_NUM"] = "16"
 
             large_timing_job_name = os.path.join(
