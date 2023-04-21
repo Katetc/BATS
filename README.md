@@ -1,12 +1,11 @@
-========================
 Build and test structure
 ========================
 
-The build and test structure (BATS) is primarily intended to allow users and developers to
+The Build And Test Structure (BATS) is primarily intended to allow users and developers to
 quickly generate a set of regression tests for use with the Land Ice Validation
-and Verification (LIVV) toolkit.
+and Verification toolkit [LIVVkit](https://github.com/LIVVkit/LIVVkit).
 
-BATS is a [Python 2.7](https://www.python.org/) module that is primarily
+BATS is a [Python 3.6](https://www.python.org/) module that is primarily
 controlled by command line options.
 BATS requires:
 
@@ -22,7 +21,7 @@ External Packages
 * [HDF5 1.8.6](https://www.hdfgroup.org/HDF5/)
 
 If you have a working install of CISM, and you installed the suggested packages
-in the [CISM](https://github.com/CISM/cism-documentation) users manual,
+in the [CISM users manual](https://escomp.github.io/cism-docs),
 you'll likely already have everything you need. If you haven't previously built
 CISM on your machine, we suggest following the installation instructions as they
 are laid out in the users manual first.
@@ -32,42 +31,82 @@ are laid out in the users manual first.
 needed modules.)
 
 If you are having any troubles with dependencies, open an issue on the
-[LIVVkit issue tracker](https://github.com/LIVVkit/LIVVkit/issues)!
+[issue tracker](https://github.com/LIVVkit/BATS/issues)!
 
-===========
-   Usage
-===========
+Installation and Usage
+======================
+Since BATS is most useful as a companion to the Land Ice Validation and Verification
+Toolkit [LIVVkit](https://github.com/LIVVkit/LIVVkit), it is reccomended to create an
+Anaconda Python environment, with LIVVkit as the only requirement.
 
-If the location of your CISM source
-code is stored in the environment variable `CISM`, you can go to the BATS
-location by:
+Firstly be sure Anaconda / Mamba is loaded or installed:
 
-```sh
-cd $CISM/tests/regression/
-```
-
-There you will find the main BATS run script `build_and_test.py`. BATS is
-primarily controlled via options specified at the command line.  To see the full
-list of options, run:
+- On Cheyenne: `module load conda/latest`
+- On Perlmutter `module load python/3.9-anaconda-2021.11`
+- Workstations or other HPC see
+[Mamba](https://mamba.readthedocs.io/en/latest/installation.html)
 
 ```sh
-./build_and_test.py -h
+conda env create -n livv -c conda-forge livvkit
+conda activate livv
 ```
+this will install everything needed to run LIVVkit and BATS, and load the environment.
 
-or
+Then, clone the BATS repository, change into the directory:
 
 ```sh
-python build_and_test.py -h
+git clone git@github.com:LIVVkit/BATS.git
+cd BATS
 ```
 
-Each LIVVkit workflow, listed on the
-[LIVVkit usage](https://github.com/LIVVkit/LIVVkit/wiki/Usage) page, shows how
-BATS is used to generate data for LIVVkit, and the commands used. We suggest
-looking at the workflows first to get a general idea of how BATS will be used.
+If, for example you are using the Cheyenne supercomputer, setup the correct modules:
+```sh
+source setup_cheyenne
+```
 
-====================
-   How BATS works
-====================
+On other platforms, ensure that the compiler you intend to use (GCC, Intel, etc.) is
+loaded, as are CMake >= 3.7, as are the netCDF, and pnetCDF libraries.
+
+You are now ready to run BATS!
+
+The main BATS run script is `build_and_test.py`. BATS is primarily controlled via
+options specified at the command line. To see the full list of options, run:
+
+```sh
+./build_and_test.py --help
+```
+
+Example test
+============
+If the location of your CISM source code is stored in the environment variable `$CISM`,
+and your desired output directory (say `/glade/scratch/${USER}/cism_tests/branchname`)
+is `$OUTDIR` you can invoke BATS by:
+
+```sh
+./build_and_test.py --platform cheyenne-intel --cism-dir ${cism} --build_dir ./build --out-dir $OUTDIR
+```
+
+This will build CISM, setup the test, and if on an HPC system print out instructions on
+running the tests, or on a workstation it will run the tests, and output will be directed
+as described below in "How BATS works".
+
+To use LIVVkit, to analize the differences, point the `$cism` environment variable at your
+updated code, and re-run, directing output to a new output directory
+(e.g. :`/glade/scratch/${USER}/cism_tests/anotherbranchname`), then run LIVVkit's validation
+suite
+
+```sh
+TEST=/glade/scratch/${USER}/cism_tests/anotherbranchname
+REF=/glade/scratch/${USER}/cism_tests/branchname
+livv -v $TEST $REF -o branch_vs_another -s
+```
+Which will generate a results website, in `./branch_vs_another` directory and serve
+it locally. See [the LIVVkit docs](https://livvkit.github.io/Docs/quickstart.html#basic-usage)
+for a quickstart guide, and more detailed instructions.
+
+
+How BATS works
+==============
 
 BATS works very similar to how you would build CISM and then run one or more CISM
 tests. BATS will build a version of CISM, and then either run a set of
@@ -161,9 +200,10 @@ directory, and which tests are run. For more information on these topics, see:
 * [The reg_test directory](https://github.com/LIVVkit/LIVVkit/wiki/BATS-reg-test) structure
 * [LIVVkit usage](https://github.com/LIVVkit/LIVVkit/wiki/Usage)
 
-=============
-   Authors
+Authors
 =============
 
-Joseph H. Kennedy, ORNL
-    github : jhkennedy
+- Joseph H. Kennedy, ORNL
+    - github : @jhkennedy
+- Michael E. Kelleher, ORNL
+    - github @mkstratos
