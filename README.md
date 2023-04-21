@@ -79,7 +79,7 @@ options specified at the command line. To see the full list of options, run:
 Example test
 ============
 If the location of your CISM source code is stored in the environment variable `$CISM`,
-and your desired output directory (say `/glade/scratch/${USER}/cism_tests/branchname`)
+and your desired output directory (say `/glade/scratch/${USER}/cism_tests/branchname_a`)
 is `$OUTDIR` you can invoke BATS by:
 
 ```sh
@@ -92,12 +92,12 @@ as described below in "How BATS works".
 
 To use LIVVkit, to analize the differences, point the `$cism` environment variable at your
 updated code, and re-run, directing output to a new output directory
-(e.g. :`/glade/scratch/${USER}/cism_tests/anotherbranchname`), then run LIVVkit's validation
+(e.g. :`/glade/scratch/${USER}/cism_tests/branchname_b`), then run LIVVkit's validation
 suite
 
 ```sh
-TEST=/glade/scratch/${USER}/cism_tests/anotherbranchname
-REF=/glade/scratch/${USER}/cism_tests/branchname
+REF=/glade/scratch/${USER}/cism_tests/branchname_a/cheyenne-intel/CISM_glissade
+TEST=/glade/scratch/${USER}/cism_tests/branchname_b/cheyenne-intel/CISM_glissade
 livv -v $TEST $REF -o branch_vs_another -s
 ```
 Which will generate a results website, in `./branch_vs_another` directory and serve
