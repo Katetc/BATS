@@ -144,7 +144,7 @@ derecho_dict = {
     "PBS_N": "reg_test_all",
     "PBS_RES": "select",
     "RES_NUM": "2:ncpus=128:mpiprocs=128",
-    "PBS_walltime": "01:00:00",
+    "PBS_walltime": "02:00:00",
     "RUN_CMD": "mpiexec",
     "gptl_makefile": "Makefile.sgi_intel",
 }
