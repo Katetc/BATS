@@ -96,8 +96,13 @@ def create_job(args, job_name, p_replace, run_commands):
     Create the job script for the HPC queues.
     """
 
+    platform_key = args.platform.split("-")[0]
+    template_file = os.path.join("util",platform_key+"_job.template")
+    if ( not(os.path.isfile(template_file)) ):
+        template_file = os.path("util","general_job.template")
+
     with open(job_name, "w") as job_file:
-        with open("util/job.template", "r") as base_job:
+        with open(template_file, "r") as base_job:
             for line in base_job:
                 for src, target in p_replace.items():
                     line = line.replace(src, target)

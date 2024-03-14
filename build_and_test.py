@@ -141,6 +141,7 @@ def main():
     if args.platform.lower().split("-")[0] in list(dicts.hpc_dict.keys()):
         isHPC = True
         args.performance = True
+        print("Machine is HPC and performance tests will run.")
     else:
         isHPC = False
 
@@ -159,11 +160,20 @@ def main():
         print("cmake directory: " + args.cmake_dir)
         print("cmake file: " + args.cmake_file)
 
+        # Check to make sure the platform exists as a supported machine in
+        # dicts.py:
+        platform_key = args.platform.split("-")[0]
+        if platform_key in list(dicts.hpc_dict.keys()):
+            print(f"{platform_key} supported, continuing")
+        else:
+            print(f"{platform_key} not found, this machine is unsupported")
+            sys.exit(1)
+
         # Make libgptl first if we're doing perf testing
         # Makefile is specified in dicts.py, for Cheynne-Intel it's Makefile.sgi_intel
         if args.performance:
             _gptl_dir = f"{args.cism_dir}/utils/libgptl"
-            platform_key = args.platform.split("-")[0]
+            #platform_key = args.platform.split("-")[0]
 
             print(f"\nBuilding GPTL in\n{_gptl_dir}")
             print(f"{'=' * len(_gptl_dir)}\n")
@@ -187,7 +197,8 @@ def main():
         # else:
         #    trilinos_string = "CISM_USE_TRILINOS=OFF"
 
-        cmake_path = Path("scripts/cmake", args.cmake_file).absolute()
+        #cmake_path = Path("scripts/cmake", args.cmake_file).absolute()
+        cmake_path = Path(args.cmake_dir, args.cmake_file).absolute()
         prep_commands = [
             f"cd {args.build_dir}",
             f"source {cmake_path} {args.cism_dir}",

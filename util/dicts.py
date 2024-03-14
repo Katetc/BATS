@@ -138,6 +138,17 @@ cheyenne_dict = {
     "gptl_makefile": "Makefile.sgi_intel",
 }
 
+derecho_dict = {
+    "PBS_A": "P93300601",
+    "PBS_q": "main",
+    "PBS_N": "reg_test_all",
+    "PBS_RES": "select",
+    "RES_NUM": "2:ncpus=128:mpiprocs=128",
+    "PBS_walltime": "01:00:00",
+    "RUN_CMD": "mpiexec",
+    "gptl_makefile": "Makefile.sgi_intel",
+}
+
 
 # MAIN HPC DICTIONARY
 # ===================
@@ -146,4 +157,5 @@ hpc_dict = {
     "titan": titan_dict,
     "hopper": hopper_dict,
     "cheyenne": cheyenne_dict,
+    "derecho": derecho_dict,
 }
